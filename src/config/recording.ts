@@ -9,9 +9,15 @@ export const RECORDING_CONFIG = {
     noiseSuppression: true,
     autoGainControl: true,
   },
+  VIDEO_TYPES: [
+    "video/webm;codecs=vp9,opus",
+    "video/webm;codecs=vp8,opus",
+    "video/webm;codecs=h264,opus",
+    "video/webm",
+    "video/mp4",
+  ],
   VIDEO_BITRATE: 2_500_000, // 2.5 Mbps
   MAX_RECORDING_DURATION: 600, // 최대 녹화 시간
-  BLOB_TIME_SLICE: 100, // Blob 분할 시간 (ms)
   SNAPSHOT_TYPE: "image/jpeg", // 스냅샷 이미지 포맷
   SNAPSHOT_QUALITY: 0.95, // 스냅샷 품질 (0.0 ~ 1.0)
 };

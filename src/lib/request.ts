@@ -1,29 +1,44 @@
 import type { KyResponse } from "ky";
 import { toast } from "sonner";
 import { z } from "zod";
+import { env } from "@/config/env";
 
 import { BaseErrorResponse, HandledToastError } from "@/api/types/base";
 
 export const INVALID_JSON = Symbol("INVALID_JSON");
 export const INVALID_DATA = Symbol("INVALID_DATA");
-export function tryJson<T>(
+
+export function tryJson<T extends Record<string, unknown>>(
+  input: string,
+  schema: z.ZodType<T>,
+):
+  | T
+  | typeof INVALID_JSON
+  | typeof INVALID_DATA
+  | z.infer<typeof BaseErrorResponse> {
+  const result = _tryJson(input, z.union([schema, BaseErrorResponse]), true);
+  return result;
+}
+
+function _tryJson<T>(
   input: string,
   schema?: z.ZodType<T>,
-  debug = false
+  debug = false,
 ): T | typeof INVALID_JSON | typeof INVALID_DATA {
   try {
-    const result = JSON.parse(input);
+    const safeInput = input?.trim() ? input : "{}";
+    const result = JSON.parse(safeInput);
     if (!schema) return result;
     const schemaResult = schema.safeParse(result);
     if (schemaResult.success) return schemaResult.data;
-    if (debug || import.meta.env.MODE !== "production") {
+    if (debug || env.DEV) {
       console.error(input);
       console.error(schemaResult.error);
     }
 
     return INVALID_DATA;
   } catch (e) {
-    if (debug || import.meta.env.MODE !== "production") {
+    if (debug || env.DEV) {
       console.error(input);
       console.error(e);
     }
@@ -31,36 +46,55 @@ export function tryJson<T>(
   }
 }
 
-export function tryJsonWithRefresh<T extends Record<string, unknown>>(
-  input: string,
-  schema: z.ZodType<T>
-):
-  | T
-  | typeof INVALID_JSON
-  | typeof INVALID_DATA
-  | z.infer<typeof BaseErrorResponse> {
-  const result = tryJson(input, z.union([schema, BaseErrorResponse]), true);
-  return result;
-}
-
-export function toastError<T extends Record<string, unknown>>(
+export function noToastError<T extends Record<string, unknown>>(
   res: KyResponse<unknown>,
-  result: T | typeof INVALID_DATA | typeof INVALID_JSON
-) {
+  result:
+    | T
+    | typeof INVALID_DATA
+    | typeof INVALID_JSON
+    | z.infer<typeof BaseErrorResponse>,
+): T {
   if (result === INVALID_DATA || result === INVALID_JSON) {
-    toast.error("오류", {
-      description: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-    });
     throw new HandledToastError(res.url, res.status);
   }
 
-  const errorResponse = BaseErrorResponse.safeParse(result);
-  if (errorResponse.success) {
-    toast.error(errorResponse.data.error.title, {
-      description: errorResponse.data.error.message,
-    });
+  if (!res.ok) {
     throw new HandledToastError(res.url, res.status);
   }
 
   return result as T;
+}
+
+export function toastError<T extends Record<string, unknown>>(
+  res: KyResponse<unknown>,
+  result:
+    | T
+    | typeof INVALID_DATA
+    | typeof INVALID_JSON
+    | z.infer<typeof BaseErrorResponse>,
+): T {
+  if (result === INVALID_DATA || result === INVALID_JSON) {
+    _toastError("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    throw new HandledToastError(res.url, res.status);
+  }
+
+  if (!res.ok) {
+    const errorResponse = BaseErrorResponse.safeParse(result);
+    if (errorResponse.success) {
+      _toastError(errorResponse.data.message);
+    } else {
+      _toastError("요청 처리 중 오류가 발생했습니다.");
+    }
+    throw new HandledToastError(res.url, res.status);
+  }
+
+  return result as T;
+}
+
+function _toastError(message: string) {
+  setTimeout(() => {
+    toast.error("오류", {
+      description: message,
+    });
+  }, 500);
 }

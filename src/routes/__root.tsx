@@ -1,12 +1,19 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  Outlet,
+  useNavigate,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { useToastStore } from "@/stores/useToastStore";
-import { useEffect } from "react";
-import { toast } from "sonner";
-
+import type { QueryClient } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
+import { env } from "@/config/env";
+import { Button } from "@/components/ui/button";
 
-export const Route = createRootRoute({
+interface RouterContext {
+  queryClient: QueryClient;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
   head: () => ({
     meta: [
@@ -20,37 +27,27 @@ export const Route = createRootRoute({
       },
     ],
   }),
+  notFoundComponent: NotFoundComponent,
 });
 
+function NotFoundComponent() {
+  const navigate = useNavigate();
+  return (
+    <div className="bg-background-primary flex h-full w-full flex-col items-center justify-center gap-10">
+      <h1 className="text-secondary text-2xl font-bold">
+        페이지를 찾을 수 없습니다.
+      </h1>
+      <Button onClick={() => navigate({ to: "/" })}>← 돌아가기</Button>
+    </div>
+  );
+}
+
 function RootComponent() {
-  const { message, type } = useToastStore();
-  const clearToast = useToastStore((state) => state.clear);
-
-  useEffect(() => {
-    if (message) {
-      switch (type) {
-        case "success":
-          toast.success(message);
-          break;
-        case "error":
-          toast.error(message);
-          break;
-        case "info":
-          toast.info(message);
-          break;
-        default:
-          toast(message);
-      }
-
-      clearToast();
-    }
-  }, [message, type, clearToast]);
-
   return (
     <>
       <Outlet />
       <Toaster />
-      {import.meta.env.DEV && <TanStackRouterDevtools />}
+      {env.DEV && <TanStackRouterDevtools />}
     </>
   );
 }

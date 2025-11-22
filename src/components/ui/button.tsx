@@ -3,19 +3,23 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ButtonHTMLAttributes } from "react";
 
 const buttonVariants = cva(
-  "cursor-pointer rounded-full px-5 py-2 font-semibold hover:scale-[1.02] transition-all",
+  cn(
+    "cursor-pointer rounded-full px-5 py-2 font-semibold hover:scale-[1.02] transition-all",
+    "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+  ),
   {
     variants: {
       variant: {
         primary:
           "bg-gradient-to-b from-gradient-primary-start to-gradient-primary-end text-white hover:opacity-90",
-        secondary: "bg-secondary-semilight text-white hover:bg-secondary",
-        ghost: "bg-transparent text-secondary hover:bg-secondary-light",
+        secondary: "bg-secondary-semilight text-white hover:opacity-90",
+        white: "bg-white/40 text-white hover:bg-white/50",
+        ghost: "bg-transparent text-secondary",
       },
       size: {
-        sm: "px-3 py-1 text-sm",
+        sm: "px-3 py-1.5 text-sm",
         md: "px-5 py-2 text-base",
-        lg: "px-8 py-3 text-lg",
+        lg: "px-8 py-3.5 text-lg",
       },
     },
     defaultVariants: {

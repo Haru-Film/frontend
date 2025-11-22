@@ -35,16 +35,18 @@ src/
 
 ## 라이브러리 사용
 
-| 카테고리              | 라이브러리                     | 설명                                                                       |
-| --------------------- | ------------------------------ | -------------------------------------------------------------------------- |
-| **라우팅 & 상태관리** | TanStack Router                | 파일 기반 라우팅                                                           |
-|                       | TanStack Query                 | 서버 상태 관리(Caching, Refetching, Optimistic Updates 등)를 간편하게 처리 |
-|                       | Zustand                        | 클라이언트 전역 상태 관리                                                  |
-| **HTTP & 검증**       | ky                             | Fetch API 기반의 HTTP 클라이언트                                           |
-|                       | Zod                            | 런타임 타입 검증 및 TypeScript 타입 추론(API 응답 검증)                    |
-| **미디어 처리**       | fix-webm-duration              | MediaRecorder로 녹화한 WebM 파일에 duration(길이) 메타데이터 추가          |
-| **UI & 스타일링**     | Tailwind CSS                   | CSS 프레임워크                                                             |
-|                       | tw-animate-css                 | Tailwind용 애니메이션 유틸리티                                             |
-|                       | Sonner                         | 토스트 알림                                                                |
-| **개발 도구**         | @tanstack/router-plugin        | TanStack Router의 파일 기반 라우팅을 위한 Vite 플러그인                    |
-|                       | @lukemorales/query-key-factory | React Query의 쿼리 키 관리를 타입 안전하게 처리 및 관리                    |
+| 카테고리              | 라이브러리                     | 설명                                                                     |
+| --------------------- | ------------------------------ | ------------------------------------------------------------------------ |
+| **라우팅 & 상태관리** | TanStack Router                | 타입 안전성을 보장하는 파일 기반 라우팅                                  |
+|                       | TanStack Query                 | 서버 상태 관리(Caching, Refetching 등) 및 비동기 처리                    |
+|                       | Zustand                        | 간결한 전역 상태 관리                                                    |
+| **HTTP & 검증**       | ky                             | Fetch API 기반 HTTP 클라이언트                                           |
+|                       | Zod                            | 런타임 스키마 검증 및 TypeScript 타입 자동 추론 (환경변수, API 응답 등)  |
+| **미디어 처리**       | fix-webm-duration              | MediaRecorder로 녹화한 WebM 파일에 누락된 duration(길이) 메타데이터 주입 |
+| **유틸리티 & 에러**   | p-limit                        | 비동기 작업의 동시 실행 개수 제한 (병목 현상 방지)                       |
+|                       | react-error-boundary           | 런타임 에러를 선언적으로 포착하고 Fallback를 표시                        |
+| **UI & 스타일링**     | Tailwind CSS                   | 유틸리티 클래스 기반 CSS 프레임워크 (v4)                                 |
+|                       | class-variance-authority (CVA) | UI 컴포넌트의 Variant(크기, 색상 등) 상태를 직관적으로 관리              |
+|                       | Sonner                         | 토스트(Toast) 알림                                                       |
+| **개발 도구**         | React Compiler                 | React 19의 자동 메모이제이션 컴파일러                                    |
+|                       | @lukemorales/query-key-factory | React Query의 쿼리 키를 체계적이고 타입 안전하게 관리                    |

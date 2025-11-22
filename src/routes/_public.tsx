@@ -2,10 +2,10 @@ import { createFileRoute, Outlet, Navigate } from "@tanstack/react-router";
 import { useTokenStore } from "@/stores/useTokenStore";
 
 export const Route = createFileRoute("/_public")({
-  component: PublicLayout,
+  component: RouteComponent,
 });
 
-function PublicLayout() {
+function RouteComponent() {
   const { token } = useTokenStore();
 
   if (token) {

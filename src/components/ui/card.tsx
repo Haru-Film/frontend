@@ -10,6 +10,7 @@ const cardVariants = cva(
         default: "bg-background-primary",
         white: "bg-background-white",
         light: "bg-secondary-light",
+        primary: "bg-background-primary",
       },
       padding: {
         none: "p-0",

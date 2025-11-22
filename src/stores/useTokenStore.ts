@@ -1,15 +1,15 @@
 import { create } from "zustand";
 
-interface tokenState {
+interface TokenState {
   token: string | null;
 }
 
-export interface AuthStore extends tokenState {
+export interface AuthStore extends TokenState {
   authorize: (token: string) => void;
   deauthorize: () => void;
 }
 
-const initialState: tokenState = {
+const initialState: TokenState = {
   token: null,
 };
 

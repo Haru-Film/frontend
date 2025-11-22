@@ -1,16 +1,11 @@
 import { z } from "zod";
 
 export const BaseSuccessResponse = z.object({
-  result: z.literal(true),
-  data: z.unknown(),
+  message: z.string().optional(),
 });
 
 export const BaseErrorResponse = z.object({
-  result: z.literal(false),
-  error: z.object({
-    title: z.string(),
-    message: z.string(),
-  }),
+  message: z.string(),
 });
 
 export class HandledToastError extends Error {

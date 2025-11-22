@@ -1,27 +1,47 @@
-import FairyCharacter from "@/components/FairyCharacter";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useTokenStore } from "@/stores/useTokenStore";
+import { queries } from "@/api";
+import { FairyCharacter } from "@/components/FairyCharacter";
 import { Header } from "@/components/ui/header";
-import { createFileRoute } from "@tanstack/react-router";
 import google from "@/assets/icons/google_login.svg";
 import { Tooltip } from "@/components/ui/tooltip";
+import { env } from "@/config/env";
 
 export const Route = createFileRoute("/_public/login/")({
+  beforeLoad: async ({ context: { queryClient } }) => {
+    const token = useTokenStore.getState().token;
+
+    if (token) {
+      throw redirect({ to: "/my", replace: true });
+    }
+
+    try {
+      const data = await queryClient.fetchQuery({
+        ...queries.auth.reissue,
+        retry: 0,
+      });
+      if (data?.accessToken) {
+        useTokenStore.getState().authorize(data.accessToken);
+        throw redirect({ to: "/my", replace: true });
+      }
+    } catch {
+      // Nothing
+    }
+  },
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <div className="bg-background-primary flex h-screen w-full flex-col">
-      <Header></Header>
+      <Header />
       <main className="flex h-full grow flex-col items-center justify-center">
         <FairyCharacter size={100} />
         <h2 className="text-secondary mb-10 text-center text-3xl font-bold">
           5초 만에 시작하는 나만의 이야기
         </h2>
         <Tooltip className="animate-bounce">로그인 / 회원가입</Tooltip>
-        <a
-          href={`${import.meta.env.VITE_API_URL}/auth/google`}
-          rel="noopener noreferrer"
-        >
+        <a href={`${env.VITE_API_URL}/auth/google`} rel="noopener noreferrer">
           <img src={google} alt="google-login" />
         </a>
       </main>

@@ -1,23 +1,10 @@
 import { mergeQueryKeys } from "@lukemorales/query-key-factory";
-import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
+import { authQueries, authMutations } from "./auth";
+import { uploadMutations } from "./upload";
+import { questionQueries } from "./question";
 
-import { authQueries } from "./auth";
+// GET 등 Query 관련 (키 자동 생성)
+export const queries = mergeQueryKeys(authQueries, questionQueries);
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      refetchOnMount: true,
-      refetchOnReconnect: true,
-      refetchOnWindowFocus: true,
-    },
-  },
-  queryCache: new QueryCache({
-    onError: async () => {},
-  }),
-  mutationCache: new MutationCache({
-    onError: async () => {},
-  }),
-});
-
-export const queries = mergeQueryKeys(authQueries);
+// POST 등 Mutation 관련 (키 수동 생성)
+export const mutations = { auth: authMutations, upload: uploadMutations };

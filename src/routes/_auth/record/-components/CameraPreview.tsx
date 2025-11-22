@@ -1,43 +1,24 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 interface CameraPreviewProps {
   stream: MediaStream | null;
-  ref: React.Ref<HTMLVideoElement>;
+  ref: React.RefObject<HTMLVideoElement | null>;
 }
 
 export function CameraPreview({ stream, ref }: CameraPreviewProps) {
-  const internalRef = useRef<HTMLVideoElement | null>(null);
-
   useEffect(() => {
-    const videoElement = internalRef.current;
-    if (videoElement && stream) {
-      videoElement.srcObject = stream;
+    if (ref.current && stream) {
+      ref.current.srcObject = stream;
     }
-
-    return () => {
-      if (videoElement) {
-        videoElement.srcObject = null;
-      }
-    };
-  }, [stream]);
+  }, [stream, ref]);
 
   return (
     <video
-      ref={(el) => {
-        internalRef.current = el;
-
-        if (ref) {
-          if (typeof ref === "function") {
-            ref(el);
-          } else {
-            ref.current = el;
-          }
-        }
-      }}
+      ref={ref}
       autoPlay
-      playsInline
       muted
-      className="w-full h-full object-cover scale-x-[-1]"
+      playsInline
+      className="absolute inset-0 h-full w-full scale-x-[-1] transform object-cover" // 거울 모드
     />
   );
 }

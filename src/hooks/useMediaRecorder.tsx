@@ -1,81 +1,76 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import fixWebmDuration from "fix-webm-duration";
-
 import { RECORDING_CONFIG } from "@/config/recording";
 
 interface UseMediaRecorderReturn {
   isRecording: boolean;
   recordedBlob: Blob | null;
   duration: number;
+  recordingStartTime: number | null;
   startRecording: () => void;
   stopRecording: () => void;
   resetRecording: () => void;
 }
 
 export function useMediaRecorder(
-  stream: MediaStream | null
+  stream: MediaStream | null,
 ): UseMediaRecorderReturn {
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
-  const [duration, setDuration] = useState(0);
 
+  // 아래 두 상태는 녹화 종료 후에만 업데이트됩니다. (Rerendering Issue)
+  const [duration, setDuration] = useState<number>(0);
+  const [recordingStartTime, setRecordingStartTime] = useState<number | null>(
+    null,
+  );
+
+  // 얘네가 실질적으로 내부 값을 저장합니다.
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
 
   const startRecording = useCallback(() => {
     if (!stream) return;
 
     const mimeType = getSupportedMimeType();
-
     const options = {
       videoBitsPerSecond: RECORDING_CONFIG.VIDEO_BITRATE,
       ...(mimeType && { mimeType }),
     };
 
     const mediaRecorder = new MediaRecorder(stream, options);
-
     chunksRef.current = [];
-    startTimeRef.current = Date.now();
+
+    const now = Date.now();
+    startTimeRef.current = now;
 
     mediaRecorder.ondataavailable = (e) => {
       if (e.data.size > 0) chunksRef.current.push(e.data);
     };
 
     mediaRecorder.onstop = async () => {
-      if (timerRef.current !== null) {
-        cancelAnimationFrame(timerRef.current);
-        timerRef.current = null;
-      }
-
       const blob = new Blob(chunksRef.current, {
         type: mimeType || "video/webm",
       });
-      const duration = Date.now() - startTimeRef.current;
-      const fixedBlob = await fixWebmDuration(blob, duration);
-      setRecordedBlob(fixedBlob);
+      let finalBlob = blob;
+
+      const recordedDuration = Date.now() - startTimeRef.current;
+      if (mimeType?.startsWith("video/webm") || !mimeType) {
+        finalBlob = await fixWebmDuration(blob, recordedDuration);
+      }
+
+      setRecordedBlob(finalBlob);
+      setDuration(recordedDuration / 1000);
       setIsRecording(false);
     };
 
-    mediaRecorder.start(RECORDING_CONFIG.BLOB_TIME_SLICE);
+    mediaRecorder.start();
     mediaRecorderRef.current = mediaRecorder;
+
     setIsRecording(true);
     setRecordedBlob(null);
     setDuration(0);
-
-    const updateTimer = () => {
-      const elapsed = (Date.now() - startTimeRef.current) / 1000;
-      setDuration(elapsed);
-
-      if (elapsed >= RECORDING_CONFIG.MAX_RECORDING_DURATION) {
-        mediaRecorderRef.current?.stop();
-        return;
-      }
-
-      timerRef.current = requestAnimationFrame(updateTimer);
-    };
-    timerRef.current = requestAnimationFrame(updateTimer);
+    setRecordingStartTime(now);
   }, [stream]);
 
   const stopRecording = useCallback(() => {
@@ -87,15 +82,14 @@ export function useMediaRecorder(
   const resetRecording = useCallback(() => {
     setRecordedBlob(null);
     setDuration(0);
+    setRecordingStartTime(null);
   }, []);
 
+  // 컴포넌트 언마운트 시 안전하게 종료
   useEffect(() => {
     return () => {
       if (mediaRecorderRef.current?.state === "recording") {
         mediaRecorderRef.current.stop();
-      }
-      if (timerRef.current !== null) {
-        cancelAnimationFrame(timerRef.current);
       }
     };
   }, []);
@@ -104,6 +98,7 @@ export function useMediaRecorder(
     isRecording,
     recordedBlob,
     duration,
+    recordingStartTime,
     startRecording,
     stopRecording,
     resetRecording,
@@ -111,19 +106,11 @@ export function useMediaRecorder(
 }
 
 function getSupportedMimeType(): string {
-  const types = [
-    "video/webm;codecs=vp9,opus",
-    "video/webm;codecs=vp8,opus",
-    "video/webm;codecs=h264,opus",
-    "video/webm",
-    "video/mp4",
-  ];
-
-  for (const type of types) {
+  for (const type of RECORDING_CONFIG.VIDEO_TYPES) {
     if (MediaRecorder.isTypeSupported(type)) {
+      console.log("Using MediaRecorder MIME type:", type);
       return type;
     }
   }
-
   return "";
 }

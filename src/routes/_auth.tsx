@@ -1,41 +1,34 @@
-import { queryClient, queries } from "@/api";
+import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
+import { queries } from "@/api";
 import { useTokenStore } from "@/stores/useTokenStore";
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { Suspense } from "react";
 
 export const Route = createFileRoute("/_auth")({
-  beforeLoad: async () => {
+  beforeLoad: async ({ context: { queryClient } }) => {
     const token = useTokenStore.getState().token;
 
-    if (token) return;
-
-    try {
-      const accessToken = await queryClient.fetchQuery({
-        ...queries.auth.reissue,
-        retry: false,
-      });
-
-      if (accessToken) {
-        useTokenStore.getState().authorize(accessToken);
-        return; // 재발급 성공
-      }
-    } catch (error) {
-      console.error("Token reissue failed:", error);
+    if (token) {
+      return;
     }
 
-    throw redirect({
-      to: "/login",
-      replace: true,
-    });
+    try {
+      const data = await queryClient.fetchQuery({
+        ...queries.auth.reissue,
+      });
+
+      if (data?.accessToken) {
+        useTokenStore.getState().authorize(data.accessToken);
+        return;
+      }
+    } catch {
+      throw redirect({
+        to: "/login",
+        replace: true,
+      });
+    }
   },
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  // TODO: Fallback 추가
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Outlet />
-    </Suspense>
-  );
+  return <Outlet />;
 }

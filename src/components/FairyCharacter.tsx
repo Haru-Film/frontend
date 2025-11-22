@@ -6,7 +6,7 @@ interface FairyCharacterProps {
   className?: string;
 }
 
-export default function FairyCharacter({
+export function FairyCharacter({
   size = 60,
   className = "",
 }: FairyCharacterProps) {

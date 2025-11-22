@@ -14,10 +14,16 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PublicLoginSuccessRouteImport } from './routes/_public/login-success'
 import { Route as PublicLoginFailureRouteImport } from './routes/_public/login-failure'
+import { Route as AuthRecordRouteImport } from './routes/_auth/record'
 import { Route as PublicWelcomeIndexRouteImport } from './routes/_public/welcome/index'
 import { Route as PublicLoginIndexRouteImport } from './routes/_public/login/index'
 import { Route as AuthRecordIndexRouteImport } from './routes/_auth/record/index'
 import { Route as AuthMyIndexRouteImport } from './routes/_auth/my/index'
+import { Route as AuthRecordUploadRouteImport } from './routes/_auth/record/upload'
+import { Route as AuthRecordThumbnailRouteImport } from './routes/_auth/record/thumbnail'
+import { Route as AuthRecordStudioRouteImport } from './routes/_auth/record/studio'
+import { Route as AuthRecordPreviewRouteImport } from './routes/_auth/record/preview'
+import { Route as AuthRecordPermissionRouteImport } from './routes/_auth/record/permission'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -42,6 +48,11 @@ const PublicLoginFailureRoute = PublicLoginFailureRouteImport.update({
   path: '/login-failure',
   getParentRoute: () => PublicRoute,
 } as any)
+const AuthRecordRoute = AuthRecordRouteImport.update({
+  id: '/record',
+  path: '/record',
+  getParentRoute: () => AuthRoute,
+} as any)
 const PublicWelcomeIndexRoute = PublicWelcomeIndexRouteImport.update({
   id: '/welcome/',
   path: '/welcome/',
@@ -53,22 +64,53 @@ const PublicLoginIndexRoute = PublicLoginIndexRouteImport.update({
   getParentRoute: () => PublicRoute,
 } as any)
 const AuthRecordIndexRoute = AuthRecordIndexRouteImport.update({
-  id: '/record/',
-  path: '/record/',
-  getParentRoute: () => AuthRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthRecordRoute,
 } as any)
 const AuthMyIndexRoute = AuthMyIndexRouteImport.update({
   id: '/my/',
   path: '/my/',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthRecordUploadRoute = AuthRecordUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => AuthRecordRoute,
+} as any)
+const AuthRecordThumbnailRoute = AuthRecordThumbnailRouteImport.update({
+  id: '/thumbnail',
+  path: '/thumbnail',
+  getParentRoute: () => AuthRecordRoute,
+} as any)
+const AuthRecordStudioRoute = AuthRecordStudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => AuthRecordRoute,
+} as any)
+const AuthRecordPreviewRoute = AuthRecordPreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
+  getParentRoute: () => AuthRecordRoute,
+} as any)
+const AuthRecordPermissionRoute = AuthRecordPermissionRouteImport.update({
+  id: '/permission',
+  path: '/permission',
+  getParentRoute: () => AuthRecordRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/record': typeof AuthRecordRouteWithChildren
   '/login-failure': typeof PublicLoginFailureRoute
   '/login-success': typeof PublicLoginSuccessRoute
+  '/record/permission': typeof AuthRecordPermissionRoute
+  '/record/preview': typeof AuthRecordPreviewRoute
+  '/record/studio': typeof AuthRecordStudioRoute
+  '/record/thumbnail': typeof AuthRecordThumbnailRoute
+  '/record/upload': typeof AuthRecordUploadRoute
   '/my': typeof AuthMyIndexRoute
-  '/record': typeof AuthRecordIndexRoute
+  '/record/': typeof AuthRecordIndexRoute
   '/login': typeof PublicLoginIndexRoute
   '/welcome': typeof PublicWelcomeIndexRoute
 }
@@ -76,6 +118,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login-failure': typeof PublicLoginFailureRoute
   '/login-success': typeof PublicLoginSuccessRoute
+  '/record/permission': typeof AuthRecordPermissionRoute
+  '/record/preview': typeof AuthRecordPreviewRoute
+  '/record/studio': typeof AuthRecordStudioRoute
+  '/record/thumbnail': typeof AuthRecordThumbnailRoute
+  '/record/upload': typeof AuthRecordUploadRoute
   '/my': typeof AuthMyIndexRoute
   '/record': typeof AuthRecordIndexRoute
   '/login': typeof PublicLoginIndexRoute
@@ -86,8 +133,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
+  '/_auth/record': typeof AuthRecordRouteWithChildren
   '/_public/login-failure': typeof PublicLoginFailureRoute
   '/_public/login-success': typeof PublicLoginSuccessRoute
+  '/_auth/record/permission': typeof AuthRecordPermissionRoute
+  '/_auth/record/preview': typeof AuthRecordPreviewRoute
+  '/_auth/record/studio': typeof AuthRecordStudioRoute
+  '/_auth/record/thumbnail': typeof AuthRecordThumbnailRoute
+  '/_auth/record/upload': typeof AuthRecordUploadRoute
   '/_auth/my/': typeof AuthMyIndexRoute
   '/_auth/record/': typeof AuthRecordIndexRoute
   '/_public/login/': typeof PublicLoginIndexRoute
@@ -97,10 +150,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/record'
     | '/login-failure'
     | '/login-success'
+    | '/record/permission'
+    | '/record/preview'
+    | '/record/studio'
+    | '/record/thumbnail'
+    | '/record/upload'
     | '/my'
-    | '/record'
+    | '/record/'
     | '/login'
     | '/welcome'
   fileRoutesByTo: FileRoutesByTo
@@ -108,6 +167,11 @@ export interface FileRouteTypes {
     | '/'
     | '/login-failure'
     | '/login-success'
+    | '/record/permission'
+    | '/record/preview'
+    | '/record/studio'
+    | '/record/thumbnail'
+    | '/record/upload'
     | '/my'
     | '/record'
     | '/login'
@@ -117,8 +181,14 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/_public'
+    | '/_auth/record'
     | '/_public/login-failure'
     | '/_public/login-success'
+    | '/_auth/record/permission'
+    | '/_auth/record/preview'
+    | '/_auth/record/studio'
+    | '/_auth/record/thumbnail'
+    | '/_auth/record/upload'
     | '/_auth/my/'
     | '/_auth/record/'
     | '/_public/login/'
@@ -168,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicLoginFailureRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_auth/record': {
+      id: '/_auth/record'
+      path: '/record'
+      fullPath: '/record'
+      preLoaderRoute: typeof AuthRecordRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_public/welcome/': {
       id: '/_public/welcome/'
       path: '/welcome'
@@ -184,10 +261,10 @@ declare module '@tanstack/react-router' {
     }
     '/_auth/record/': {
       id: '/_auth/record/'
-      path: '/record'
-      fullPath: '/record'
+      path: '/'
+      fullPath: '/record/'
       preLoaderRoute: typeof AuthRecordIndexRouteImport
-      parentRoute: typeof AuthRoute
+      parentRoute: typeof AuthRecordRoute
     }
     '/_auth/my/': {
       id: '/_auth/my/'
@@ -196,17 +273,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthMyIndexRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/record/upload': {
+      id: '/_auth/record/upload'
+      path: '/upload'
+      fullPath: '/record/upload'
+      preLoaderRoute: typeof AuthRecordUploadRouteImport
+      parentRoute: typeof AuthRecordRoute
+    }
+    '/_auth/record/thumbnail': {
+      id: '/_auth/record/thumbnail'
+      path: '/thumbnail'
+      fullPath: '/record/thumbnail'
+      preLoaderRoute: typeof AuthRecordThumbnailRouteImport
+      parentRoute: typeof AuthRecordRoute
+    }
+    '/_auth/record/studio': {
+      id: '/_auth/record/studio'
+      path: '/studio'
+      fullPath: '/record/studio'
+      preLoaderRoute: typeof AuthRecordStudioRouteImport
+      parentRoute: typeof AuthRecordRoute
+    }
+    '/_auth/record/preview': {
+      id: '/_auth/record/preview'
+      path: '/preview'
+      fullPath: '/record/preview'
+      preLoaderRoute: typeof AuthRecordPreviewRouteImport
+      parentRoute: typeof AuthRecordRoute
+    }
+    '/_auth/record/permission': {
+      id: '/_auth/record/permission'
+      path: '/permission'
+      fullPath: '/record/permission'
+      preLoaderRoute: typeof AuthRecordPermissionRouteImport
+      parentRoute: typeof AuthRecordRoute
+    }
   }
 }
 
-interface AuthRouteChildren {
-  AuthMyIndexRoute: typeof AuthMyIndexRoute
+interface AuthRecordRouteChildren {
+  AuthRecordPermissionRoute: typeof AuthRecordPermissionRoute
+  AuthRecordPreviewRoute: typeof AuthRecordPreviewRoute
+  AuthRecordStudioRoute: typeof AuthRecordStudioRoute
+  AuthRecordThumbnailRoute: typeof AuthRecordThumbnailRoute
+  AuthRecordUploadRoute: typeof AuthRecordUploadRoute
   AuthRecordIndexRoute: typeof AuthRecordIndexRoute
 }
 
-const AuthRouteChildren: AuthRouteChildren = {
-  AuthMyIndexRoute: AuthMyIndexRoute,
+const AuthRecordRouteChildren: AuthRecordRouteChildren = {
+  AuthRecordPermissionRoute: AuthRecordPermissionRoute,
+  AuthRecordPreviewRoute: AuthRecordPreviewRoute,
+  AuthRecordStudioRoute: AuthRecordStudioRoute,
+  AuthRecordThumbnailRoute: AuthRecordThumbnailRoute,
+  AuthRecordUploadRoute: AuthRecordUploadRoute,
   AuthRecordIndexRoute: AuthRecordIndexRoute,
+}
+
+const AuthRecordRouteWithChildren = AuthRecordRoute._addFileChildren(
+  AuthRecordRouteChildren,
+)
+
+interface AuthRouteChildren {
+  AuthRecordRoute: typeof AuthRecordRouteWithChildren
+  AuthMyIndexRoute: typeof AuthMyIndexRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthRecordRoute: AuthRecordRouteWithChildren,
+  AuthMyIndexRoute: AuthMyIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

@@ -1,4 +1,4 @@
-import FairyCharacter from "@/components/FairyCharacter";
+import { FairyCharacter } from "@/components/FairyCharacter";
 import { cn } from "@/lib/utils";
 
 export function TitleArea() {
